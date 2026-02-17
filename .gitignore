@@ -11,16 +11,8 @@ __pycache__/
 dist/
 build/
 
-# Data (keep structure, ignore large/generated)
-data/bronze/*.json
-!data/bronze/.gitkeep
-data/silver/*.json
-!data/silver/.gitkeep
-data/gold/*.json
-data/gold/*.csv
-data/gold/reports/*.csv
-!data/gold/.gitkeep
-!data/gold/reports/.gitkeep
+
+
 
 # IDE and OS
 .idea/
