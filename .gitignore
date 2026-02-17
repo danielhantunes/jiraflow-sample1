@@ -12,8 +12,6 @@ dist/
 build/
 
 # Data (keep structure, ignore large/generated)
-data/raw/*.json
-!data/raw/.gitkeep
 data/bronze/*.json
 !data/bronze/.gitkeep
 data/silver/*.json

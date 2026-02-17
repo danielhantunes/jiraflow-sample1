@@ -1,1 +1,1 @@
-# Raw data ingestion (local tickets_raw.json only)
+# Bronze ingestion: source file path (e.g. tickets_raw.json at project root)

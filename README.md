@@ -2,11 +2,13 @@
 
 ## Overview
 
-This repository implements a **data engineering pipeline** that ingests ticket/issue data from a local **tickets_raw.json** file, processes it through a **Medallion architecture (Raw → Bronze → Silver → Gold)**, and produces SLA metrics plus aggregated reports.
+This repository implements a **data engineering pipeline** that ingests ticket/issue data from a local **tickets_raw.json** file, processes it through a **Medallion architecture (Bronze → Silver → Gold)**, and produces SLA metrics plus aggregated reports.
 
 ---
 
 ## Quick start
+
+Put **tickets_raw.json** at the project root (or set `INPUT_FILENAME` in `.env`).
 
 ```bash
 pip install -r requirements.txt
@@ -19,16 +21,15 @@ python -m src.main
 
 | Layer   | Responsibility |
 |--------|-----------------|
-| **Raw**   | Store the original input file as received |
-| **Bronze** | Normalize and flatten raw JSON (JSON) |
+| **Bronze** | Normalize and flatten source JSON (JSON) |
 | **Silver** | Extract nested fields, clean, validate, filter statuses (JSON; clean data only) |
 | **Gold**   | Resolved/Done issues only; SLA in business hours and reports |
 
 ```
-Raw  →  Bronze  →  Silver  →  Gold
- |        |         |         |
-data/raw  data/bronze  data/silver  data/gold
-                                    (reports)
+Bronze  →  Silver  →  Gold
+   |         |         |
+data/bronze  data/silver  data/gold
+                          (reports)
 ```
 
 ---
@@ -51,7 +52,7 @@ pip install -r requirements.txt
 
 ### Provide input data
 
-Place the ticket export at the project root as **tickets_raw.json** (or set `RAW_INPUT_FILENAME` in `.env` to another filename at the project root). The JSON must have an **`issues`** array; each issue can have `id`, `issue_type`, `status`, `priority`, and nested **`assignee`** / **`timestamps`** arrays (see `tickets_raw.json` in the repo for the expected shape).
+Place the ticket export at the project root as **tickets_raw.json** (or set `INPUT_FILENAME` in `.env` to another filename at the project root). The JSON must have an **`issues`** array; each issue can have `id`, `issue_type`, `status`, `priority`, and nested **`assignee`** / **`timestamps`** arrays (see `tickets_raw.json` in the repo for the expected shape).
 
 ### Run the full pipeline
 
@@ -59,13 +60,12 @@ Place the ticket export at the project root as **tickets_raw.json** (or set `RAW
 python -m src.main
 ```
 
-Outputs are written under `data/`: raw copy, bronze JSON, silver JSON (clean data only), gold JSON and **CSV reports** under `data/gold/reports/`.
+Outputs are written under `data/`: bronze JSON, silver JSON (clean data only), gold JSON and **CSV reports** under `data/gold/reports/`.
 
 ---
 
 ## Output files
 
-- `data/raw/<source_name>.json`
 - `data/bronze/bronze_issues.json`
 - `data/silver/silver_issues.json`
 - `data/gold/gold_sla_issues.json`
@@ -110,7 +110,7 @@ Only tickets with status **Done** or **Resolved** are included. Columns include:
 
 Copy `.env.example` to `.env` and adjust if needed.
 
-- **RAW_INPUT_FILENAME** — default `tickets_raw.json` (file at project root).
+- **INPUT_FILENAME** — default `tickets_raw.json` (file at project root).
 - **HOLIDAY_API_URL**, **HOLIDAY_COUNTRY_CODE** — used to fetch public holidays (cached under `data/reference/`).
 - **DEFAULT_HOLIDAY_YEAR** — used only when the data has no valid `created_at`/`resolved_at` years; otherwise years are taken from the data.
 
@@ -121,14 +121,13 @@ Copy `.env.example` to `.env` and adjust if needed.
 ```
 project_root/
 ├── data/
-│   ├── raw/
 │   ├── bronze/
 │   ├── silver/
 │   ├── reference/
 │   └── gold/
 │       └── reports/
 ├── src/
-│   ├── ingestion/   # Raw ingestion (local tickets_raw.json only)
+│   ├── ingestion/   # Bronze ingestion (source file path)
 │   ├── bronze/      # Normalization
 │   ├── silver/      # Cleaning, validation, filtering
 │   ├── gold/        # SLA and reports
@@ -144,7 +143,7 @@ project_root/
 
 ## Design notes
 
-- **Local file only:** Input is **tickets_raw.json** at the project root; no cloud or Azure integration.
+- **Local file only:** Input is **tickets_raw.json** at the project root (or the file set by **INPUT_FILENAME**); no cloud or Azure integration.
 - **JSON** for Bronze/Silver/Gold (array of records; CSV for gold reports).
 - **Silver** outputs only clean data (invalid/duplicate rows are dropped, not persisted).
 - **Holiday data** is cached under `data/reference/` to avoid repeated API calls.

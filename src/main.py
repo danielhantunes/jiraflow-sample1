@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from src.bronze.bronze_pipeline import run_bronze
 from src.gold.gold_pipeline import run_gold
-from src.ingestion.ingest_raw import ingest_raw_data
+from src.ingestion.ingest_bronze import get_source_path
 from src.silver.silver_pipeline import run_silver
 
 
 def run_pipeline() -> None:
-    """Run the end-to-end pipeline: Raw → Bronze → Silver → Gold."""
-    raw_path = ingest_raw_data()
-    bronze_path = run_bronze(raw_path)
+    """Run the end-to-end pipeline: Bronze → Silver → Gold."""
+    source_path = get_source_path()
+    bronze_path = run_bronze(source_path)
     run_silver(bronze_path)
     run_gold()
 

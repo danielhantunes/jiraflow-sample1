@@ -31,14 +31,13 @@ def _load_env_file(env_path: Path) -> None:
 _load_env_file(PROJECT_ROOT / ".env")
 
 DATA_DIR = PROJECT_ROOT / "data"
-RAW_DIR = DATA_DIR / "raw"
 BRONZE_DIR = DATA_DIR / "bronze"
 SILVER_DIR = DATA_DIR / "silver"
 GOLD_DIR = DATA_DIR / "gold"
 REFERENCE_DIR = DATA_DIR / "reference"
 
-RAW_INPUT_FILENAME = os.getenv("RAW_INPUT_FILENAME", "tickets_raw.json")
-RAW_INPUT_PATH = PROJECT_ROOT / RAW_INPUT_FILENAME
+INPUT_FILENAME = os.getenv("INPUT_FILENAME", "tickets_raw.json")
+INPUT_PATH = PROJECT_ROOT / INPUT_FILENAME
 
 HOLIDAY_API_URL = os.getenv("HOLIDAY_API_URL", "https://date.nager.at/api/v3/PublicHolidays")
 HOLIDAY_COUNTRY_CODE = os.getenv("HOLIDAY_COUNTRY_CODE", "BR")
