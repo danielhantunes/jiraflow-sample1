@@ -10,8 +10,8 @@ from src.utils.config import SILVER_DIR
 
 
 def read_bronze(bronze_path: Path) -> pd.DataFrame:
-    """Read Bronze data from disk."""
-    return pd.read_parquet(bronze_path)
+    """Read Bronze data from disk (JSON)."""
+    return pd.read_json(bronze_path, orient="records")
 
 
 def _normalize_items(items: object) -> list | None:
@@ -108,13 +108,13 @@ def filter_statuses(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def write_silver(df: pd.DataFrame, output_path: Path) -> Path:
-    """Write Silver data to disk."""
+    """Write Silver data to disk (JSON)."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(output_path, index=False)
+    df.to_json(output_path, orient="records", date_format="iso", index=False)
     return output_path
 
 
-def run_silver(bronze_path: Path, output_filename: str = "silver_issues.parquet") -> Path:
+def run_silver(bronze_path: Path, output_filename: str = "silver_issues.json") -> Path:
     """Execute the Silver pipeline; output is clean data only in data/silver/."""
     bronze_df = read_bronze(bronze_path)
     extracted = extract_and_rename_fields(bronze_df)

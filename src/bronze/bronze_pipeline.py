@@ -40,9 +40,9 @@ def add_source_file(df: pd.DataFrame, source_file: Path) -> pd.DataFrame:
 
 
 def write_bronze(df: pd.DataFrame, output_path: Path) -> Path:
-    """Write Bronze data to disk (Parquet)."""
+    """Write Bronze data to disk (JSON)."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(output_path, index=False)
+    df.to_json(output_path, orient="records", date_format="iso", index=False)
     return output_path
 
 
@@ -57,7 +57,7 @@ def _coerce_raw_paths(raw_file_path: RawPathInput) -> List[Path]:
 
 def run_bronze(
     raw_file_path: RawPathInput,
-    output_filename: str = "bronze_issues.parquet",
+    output_filename: str = "bronze_issues.json",
 ) -> Path:
     """Execute the Bronze pipeline."""
     raw_paths = _coerce_raw_paths(raw_file_path)

@@ -14,11 +14,11 @@ build/
 # Data (keep structure, ignore large/generated)
 data/raw/*.json
 !data/raw/.gitkeep
-data/bronze/*.parquet
+data/bronze/*.json
 !data/bronze/.gitkeep
-data/silver/*.parquet
+data/silver/*.json
 !data/silver/.gitkeep
-data/gold/*.parquet
+data/gold/*.json
 data/gold/*.csv
 data/gold/reports/*.csv
 !data/gold/.gitkeep

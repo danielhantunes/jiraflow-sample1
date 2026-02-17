@@ -22,8 +22,8 @@ from src.utils.date_utils import fetch_public_holidays
 
 
 def read_silver(silver_path: Path) -> pd.DataFrame:
-    """Read Silver data from disk."""
-    df = pd.read_parquet(silver_path)
+    """Read Silver data from disk (JSON)."""
+    df = pd.read_json(silver_path, orient="records")
     df["created_at"] = pd.to_datetime(df["created_at"], errors="coerce", utc=True)
     df["resolved_at"] = pd.to_datetime(df["resolved_at"], errors="coerce", utc=True)
     return df
@@ -80,9 +80,9 @@ def select_gold_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def write_gold(df: pd.DataFrame, output_path: Path) -> Path:
-    """Write Gold data to disk."""
+    """Write Gold data to disk (JSON)."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(output_path, index=False)
+    df.to_json(output_path, orient="records", date_format="iso", index=False)
     return output_path
 
 
@@ -132,8 +132,8 @@ def write_sla_reports(df: pd.DataFrame, output_dir: Path = GOLD_DIR / "reports")
 
 
 def run_gold(
-    silver_path: Path = SILVER_DIR / "silver_issues.parquet",
-    output_filename: str = "gold_sla_issues.parquet",
+    silver_path: Path = SILVER_DIR / "silver_issues.json",
+    output_filename: str = "gold_sla_issues.json",
 ) -> Path:
     """Execute the Gold pipeline."""
     silver_df = read_silver(silver_path)

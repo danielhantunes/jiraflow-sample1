@@ -20,8 +20,8 @@ python -m src.main
 | Layer   | Responsibility |
 |--------|-----------------|
 | **Raw**   | Store the original input file as received |
-| **Bronze** | Normalize and flatten raw JSON (Parquet) |
-| **Silver** | Extract nested fields, clean, validate, filter statuses (Parquet; clean data only) |
+| **Bronze** | Normalize and flatten raw JSON (JSON) |
+| **Silver** | Extract nested fields, clean, validate, filter statuses (JSON; clean data only) |
 | **Gold**   | Resolved/Done issues only; SLA in business hours and reports |
 
 ```
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 ### Provide input data
 
-Place the ticket export at the project root as **tickets_raw.json** (or set `RAW_INPUT_FILENAME` in `.env` to point to another filename at the project root).
+Place the ticket export at the project root as **tickets_raw.json** (or set `RAW_INPUT_FILENAME` in `.env` to another filename at the project root). The JSON must have an **`issues`** array; each issue can have `id`, `issue_type`, `status`, `priority`, and nested **`assignee`** / **`timestamps`** arrays (see `tickets_raw.json` in the repo for the expected shape).
 
 ### Run the full pipeline
 
@@ -59,16 +59,16 @@ Place the ticket export at the project root as **tickets_raw.json** (or set `RAW
 python -m src.main
 ```
 
-Outputs are written under `data/`: raw copy, bronze Parquet, silver Parquet (clean data only), gold Parquet and **CSV reports** under `data/gold/reports/`.
+Outputs are written under `data/`: raw copy, bronze JSON, silver JSON (clean data only), gold JSON and **CSV reports** under `data/gold/reports/`.
 
 ---
 
 ## Output files
 
 - `data/raw/<source_name>.json`
-- `data/bronze/bronze_issues.parquet`
-- `data/silver/silver_issues.parquet`
-- `data/gold/gold_sla_issues.parquet` (and optional `.csv` export)
+- `data/bronze/bronze_issues.json`
+- `data/silver/silver_issues.json`
+- `data/gold/gold_sla_issues.json`
 - `data/gold/reports/gold_sla_by_analyst.csv`
 - `data/gold/reports/gold_sla_by_issue_type.csv`
 
@@ -111,7 +111,8 @@ Only tickets with status **Done** or **Resolved** are included. Columns include:
 Copy `.env.example` to `.env` and adjust if needed.
 
 - **RAW_INPUT_FILENAME** — default `tickets_raw.json` (file at project root).
-- **HOLIDAY_API_URL**, **HOLIDAY_COUNTRY_CODE**, **DEFAULT_HOLIDAY_YEAR** — for holiday cache used in SLA calculation.
+- **HOLIDAY_API_URL**, **HOLIDAY_COUNTRY_CODE** — used to fetch public holidays (cached under `data/reference/`).
+- **DEFAULT_HOLIDAY_YEAR** — used only when the data has no valid `created_at`/`resolved_at` years; otherwise years are taken from the data.
 
 ---
 
@@ -144,6 +145,6 @@ project_root/
 ## Design notes
 
 - **Local file only:** Input is **tickets_raw.json** at the project root; no cloud or Azure integration.
-- **Parquet** for Bronze/Silver/Gold for compact, columnar storage.
+- **JSON** for Bronze/Silver/Gold (array of records; CSV for gold reports).
 - **Silver** outputs only clean data (invalid/duplicate rows are dropped, not persisted).
 - **Holiday data** is cached under `data/reference/` to avoid repeated API calls.
