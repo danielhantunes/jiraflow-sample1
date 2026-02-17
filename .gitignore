@@ -1,0 +1,31 @@
+# Environment and secrets
+.env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Data (keep structure, ignore large/generated)
+data/raw/*.json
+!data/raw/.gitkeep
+data/bronze/*.parquet
+!data/bronze/.gitkeep
+data/silver/*.parquet
+!data/silver/.gitkeep
+data/gold/*.parquet
+data/gold/*.csv
+data/gold/reports/*.csv
+!data/gold/.gitkeep
+!data/gold/reports/.gitkeep
+
+# IDE and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
